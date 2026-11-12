@@ -30,12 +30,14 @@
   "build": {
     "appId": "com.ecgtrainer.desktop",
     "productName": "ECG Trainer",
+    "copyright": "Copyright (c) 2026 Yan Sitdikov",
     "directories": {
       "output": "dist"
     },
     "files": [
       "index.html",
       "electron-main.js",
+      "LICENSE",
       "resources/**/*",
       "!tests/**"
     ],
