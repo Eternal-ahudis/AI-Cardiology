@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1RMYQC13N1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1RMYQC13N1');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A tool for learning cardiac axis / QRS axis and ECG pathologies interpretation.">
+    <title>Cardiac axis &amp; ECG pathology trainer</title>
+    <link rel="stylesheet" href="./resources/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+
+        <header>
+            <div id="headerWrapper">
+                <h1 class="text-center"></h1>
+                <nav>
+                    <button id="button_cabrera" class="no_highlights">Axis</button>
+                    <button id="button_pathologies" class="no_highlights">Pathologies</button>
+                    <button id="button_quiz" class="no_highlights">Quiz</button>
+                    <button id="button_about" class="no_highlights">Info</button>
+                    <div>
+                        <button id="button_ru" class="langButton no_highlights">Ru</button>
+                        <button id="button_en" class="langButton no_highlights">En</button>
+                        <button id="button_de" class="langButton no_highlights">De</button>
+                        <button id="button_es" class="langButton no_highlights">Es</button>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+
+            <div class="split">
+                <div id="cabrera" class="containerInner">
+                    <div id="bigCircle">
+                        <div id="lagetyp"></div>
+                        <div id="line">
+                            <div id="lineright"></div>
+                        </div>
+                        <div id="circleDe">
+                            <div class="circleLines de"></div>
+                            <div id="uelt"></div>
+                            <div id="lt"></div>
+                            <div id="it"></div>
+                            <div id="st"></div>
+                            <div id="rt"></div>
+                            <div id="uert"></div>
+                            <div id="nwt"></div>
+                        </div>
+
+                        <div id="circleInt">
+                            <div class="circleLines en"></div>
+                            <div id="enLad"></div>
+                            <div id="enNormal"></div>
+                            <div id="enRad"></div>
+                            <div id="enNwt"></div>
+                        </div>
+
+                        <div id="circleRu">
+                            <div class="circleLines de"></div>
+                            <div id="ruLad"></div>
+                            <div id="ruHoriz"></div>
+                            <div id="ruNormal"></div>
+                            <div id="ruVert"></div>
+                            <div id="ruRad"></div>
+                            <div id="ruNwt"></div>
+                        </div>
+                    </div>
+                    <div id="axisMetricsBar"></div>
+                </div>
+
+                <div id="pathologies" class="containerInner">
+                    <div class="panelCard">
+                        <div class="panelTitle">
+                            <span>Разделы пособия</span>
+                        </div>
+                        <div id="categoryTabs" class="categoryTabs"></div>
+                        <div id="pathologyList" class="pathologyList"></div>
+                    </div>
+
+                    <div class="panelCard">
+                        <div class="panelTitle">
+                            <span id="selectedPathologyTitle">Параметры ЭКГ</span>
+                        </div>
+                        <div class="paramGrid">
+                            <div class="paramRow" id="hrControlRow">
+                                <label for="hrSlider">
+                                    <span>ЧСС</span>
+                                    <span id="hrValueLabel">72 уд/мин</span>
+                                </label>
+                                <input type="range" id="hrSlider" min="30" max="220" value="72">
+                            </div>
+                            <div class="paramRow" id="axisControlRow">
+                                <label for="axisSlider">
+                                    <span>Угол ЭОС (α)</span>
+                                    <span id="axisValueLabel">+45° (Нормальная ЭОС)</span>
+                                </label>
+                                <input type="range" id="axisSlider" min="-180" max="180" value="45">
+                            </div>
+                            <div class="paramRow" id="miStageRow" style="display: none;">
+                                <label for="miStageSelect"><span>Стадия инфаркта миокарда</span></label>
+                                <select id="miStageSelect"></select>
+                            </div>
+                            <div class="paramRow" id="miDepthRow" style="display: none;">
+                                <label for="miDepthSelect"><span>Глубина поражения</span></label>
+                                <select id="miDepthSelect"></select>
+                            </div>
+                            <div class="paramRow" id="localizationRow" style="display: none;">
+                                <label for="localizationSelect"><span>Локализация (стенка ЛЖ)</span></label>
+                                <select id="localizationSelect"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panelCard">
+                        <div class="panelTitle"><span>ЭКГ-признаки по пособию</span></div>
+                        <ul id="criteriaList" class="criteriaList"></ul>
+                        <div id="clinicalNote" class="clinicalNote"></div>
+                    </div>
+                </div>
+
+                <div id="quiz" class="containerInner">
+                    <div id="quizModeBar">
+                        <button id="quizModeAxis" class="quizModeBtn active">Определение ЭОС</button>
+                        <button id="quizModePathology" class="quizModeBtn">Патология по ЭКГ</button>
+                        <button id="quizModeTextbook" class="quizModeBtn">Тесты из пособия</button>
+                    </div>
+
+                    <div id="axisQuizContainer">
+                        <button id="button_lt" class="answer de">Linkstyp</button>
+                        <button id="button_it" class="answer de">Indifferenztyp</button>
+                        <button id="button_st" class="answer de">Steiltyp</button>
+                        <button id="button_rt" class="answer de">Rechtstyp</button>
+                        <button id="button_uelt" class="answer de">Ueberdrehter Linkstyp</button>
+                        <button id="button_uert" class="answer de">Ueberdrehter Rechtstyp</button>
+
+                        <button id="button_enNormal" class="answer en">Normal QRS axis</button>
+                        <button id="button_enLad" class="answer en">Left axis deviation</button>
+                        <button id="button_enRad" class="answer en">Right axis deviation</button>
+
+                        <button id="button_ruLad" class="answer ru">Отклонение ЭОС влево</button>
+                        <button id="button_ruHoriz" class="answer ru">Горизонтальная ЭОС</button>
+                        <button id="button_ruNormal" class="answer ru">Нормальная ЭОС</button>
+                        <button id="button_ruVert" class="answer ru">Вертикальная ЭОС</button>
+                        <button id="button_ruRad" class="answer ru">Отклонение ЭОС вправо</button>
+                    </div>
+
+                    <div id="pathologyQuizContainer">
+                        <div class="quizPromptCard">
+                            <strong>Определите патологию по ЭКГ справа:</strong>
+                            <div id="pathoQuizSubhint" style="margin-top:0.25rem; color:#4b5563; font-size:0.75rem;">
+                                Оцените ритм, интервалы RR, P, PQ, QRS, ST и T в 12 отведениях.
+                            </div>
+                        </div>
+                        <div class="quizActionRow">
+                            <button id="pathoQuizHintBtn" class="quizSecondaryBtn">Подсказка (план анализа)</button>
+                            <button id="pathoQuizNextBtn" class="quizPrimaryBtn">Следующая ЭКГ</button>
+                        </div>
+                        <div id="pathoQuizHintBox" class="quizHintBox"></div>
+                        <div id="pathoQuizOptions" class="quizOptionsGrid"></div>
+                        <div id="pathoQuizFeedback" class="quizFeedbackBox"></div>
+                    </div>
+
+                    <div id="textbookQuizContainer">
+                        <div id="textbookQuizPrompt" class="quizPromptCard"></div>
+                        <div id="textbookQuizOptions" class="quizOptionsGrid"></div>
+                        <div class="quizActionRow">
+                            <button id="textbookQuizCheckBtn" class="quizPrimaryBtn" style="display:none;">Проверить</button>
+                            <button id="textbookQuizNextBtn" class="quizSecondaryBtn">Следующий вопрос</button>
+                        </div>
+                        <div id="textbookQuizFeedback" class="quizFeedbackBox"></div>
+                    </div>
+
+                    <div id="quizCountersRow">
+                        <div class="answer answerCounter" id="correct"><span id="labelCorrect"></span>:&nbsp;<span
+                                id="answersCorrect">0</span>
+                        </div>
+                        <div class="answer answerCounter" id="wrong"><span id="labelWrong"></span>:&nbsp;<span
+                                id="answersWrong">0</span></div>
+                    </div>
+                </div>
+
+                <div id="about" class="containerInner2">
+                    <section id="sectionContact">
+                        <div>
+                            <img src="./resources/images/mail.svg">
+                            <a href="mailto:davidschaack@cardiotools.net">davidschaack@gmail.com</a>
+                        </div>
+                        <div>
+                            <img src="./resources/images/twitter.svg">
+                            <a href="https://twitter.com/dvidschaack" target="_blank">@dvidschaack</a>
+                        </div>
+                        <div>
+                            <img src="./resources/images/github.svg">
+                            <a href="https://github.com/david-shrk/ecgaxistrainer"
+                                target="_blank">github.com/david-shrk/ecgaxistrainer</a>
+                        </div>
+                    </section>
+                    <section id="sectionGeneral">
+                    </section>
+                    <section id="sectionSources">
+                    </section>
+                    <section>
+                        <h2>MIT License</h2>
+                        <p>Copyright (c) 2022 David Schaack</p>
+                        <p>
+                            Permission is hereby granted, free of charge, to any person obtaining a copy
+                            of this software and associated documentation files (the "Software"), to deal
+                            in the Software without restriction, including without limitation the rights
+                            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                            copies of the Software, and to permit persons to whom the Software is
+                            furnished to do so, subject to the following conditions:
+                        </p>
+                        <p>
+                            The above copyright notice and this permission notice shall be included in all
+                            copies or substantial portions of the Software.
+                        </p>
+                        <p>
+                            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+                            SOFTWARE.
+                        </p>
+                    </section>
+                </div>
+
+                <div id="ecg" class="containerInner">
+                    <div id="ecgToolbar">
+                        <div class="toolbarGroup">
+                            <button id="view12Btn" class="toolBtn active">12 отв.</button>
+                            <button id="view6Btn" class="toolBtn">6 отв.</button>
+                            <button id="viewRhythmBtn" class="toolBtn">Ритм (II, V1, V5)</button>
+                        </div>
+                        <div class="toolbarGroup">
+                            <button id="speed25Btn" class="toolBtn active">25 мм/с</button>
+                            <button id="speed50Btn" class="toolBtn">50 мм/с</button>
+                        </div>
+                    </div>
+                    <div id="ecgCanvasBox">
+                        <canvas id="ecgCanvas" width="600" height="600"></canvas>
+                        <canvas id="gridCanvas" width="600" height="600"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <section id="analysisSection">
+                <div class="panelCard">
+                    <div class="analysisTabs">
+                        <button id="tabPlanBtn" class="analysisTabBtn active">План анализа ЭКГ (12 пунктов, гл. 5.1)</button>
+                        <button id="tabAlgoBtn" class="analysisTabBtn">Алгоритм описания (рис. 5.1)</button>
+                    </div>
+                    <div id="analysisPlanContainer" class="analysisGrid"></div>
+                    <div id="analysisAlgoContainer" class="algoTraceWrap" style="display: none;"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+</body>
+
+<script src="./resources/js/languages.js" defer></script>
+<script src="./resources/js/circleCalculations.js" defer></script>
+<script src="./resources/js/ecgPathologies.js" defer></script>
+<script src="./resources/js/ecgCalculations.js" defer></script>
+<script src="./resources/js/ecgAnalysis.js" defer></script>
+<script src="./resources/js/ecgDrawing.js" defer></script>
+<script src="./resources/js/main.js" defer></script>
+
+</html>
