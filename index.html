@@ -14,9 +14,15 @@
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
     <meta name="description" content="A tool for learning cardiac axis / QRS axis and ECG pathologies interpretation.">
     <title>Cardiac axis &amp; ECG pathology trainer</title>
+    <link rel="icon" type="image/svg+xml" href="./resources/images/favicon.svg">
     <link rel="stylesheet" href="./resources/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,17 +206,17 @@
                 <div id="about" class="containerInner2">
                     <section id="sectionContact">
                         <div>
-                            <img src="./resources/images/mail.svg">
+                            <img src="./resources/images/mail.svg" alt="">
                             <a href="mailto:davidschaack@cardiotools.net">davidschaack@gmail.com</a>
                         </div>
                         <div>
-                            <img src="./resources/images/twitter.svg">
-                            <a href="https://twitter.com/dvidschaack" target="_blank">@dvidschaack</a>
+                            <img src="./resources/images/twitter.svg" alt="">
+                            <a href="https://twitter.com/dvidschaack" target="_blank" rel="noopener noreferrer">@dvidschaack</a>
                         </div>
                         <div>
-                            <img src="./resources/images/github.svg">
+                            <img src="./resources/images/github.svg" alt="">
                             <a href="https://github.com/david-shrk/ecgaxistrainer"
-                                target="_blank">github.com/david-shrk/ecgaxistrainer</a>
+                                target="_blank" rel="noopener noreferrer">github.com/david-shrk/ecgaxistrainer</a>
                         </div>
                     </section>
                     <section id="sectionGeneral">
@@ -277,14 +283,13 @@
         </main>
     </div>
 
+    <script src="./resources/js/languages.js" defer></script>
+    <script src="./resources/js/circleCalculations.js" defer></script>
+    <script src="./resources/js/ecgPathologies.js" defer></script>
+    <script src="./resources/js/ecgCalculations.js" defer></script>
+    <script src="./resources/js/ecgAnalysis.js" defer></script>
+    <script src="./resources/js/ecgDrawing.js" defer></script>
+    <script src="./resources/js/main.js" defer></script>
 </body>
-
-<script src="./resources/js/languages.js" defer></script>
-<script src="./resources/js/circleCalculations.js" defer></script>
-<script src="./resources/js/ecgPathologies.js" defer></script>
-<script src="./resources/js/ecgCalculations.js" defer></script>
-<script src="./resources/js/ecgAnalysis.js" defer></script>
-<script src="./resources/js/ecgDrawing.js" defer></script>
-<script src="./resources/js/main.js" defer></script>
 
 </html>
