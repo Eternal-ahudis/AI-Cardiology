@@ -177,6 +177,52 @@ function traceDiagnosticAlgorithm(ecgState) {
                 { node: 'М-образный R?', answer: 'в левых грудных (V5–V6)' }
             ],
             conclusion: 'БЛевойНПГ — полная блокада левой ножки пучка Гиса'
+        },
+        pericarditis_acute: {
+            path: ['rr_equal', 'p_present_reg', 'sr', 'pq_ok', 'qrs_ok_2', 'pericarditis_acute'],
+            steps: [
+                { node: 'Инт. RR одинаковы?', answer: 'да' },
+                { node: 'з. P есть?*', answer: 'да → СР' },
+                { node: 'PQ ≤ 0,2 с?', answer: 'да (депрессия сегмента PR в отведениях I, II, aVF, V2–V6 и элевация в aVR)' },
+                { node: 'все QRS ≤ 0,1 с?', answer: 'да' },
+                { node: 'Патологический зубец Q?', answer: 'нет (некроз миокарда отсутствует)' },
+                { node: 'Характер элевации ST?', answer: 'диффузный вогнутый (седловидный) подъём ST без зеркальной депрессии (депрессия только в aVR)' }
+            ],
+            conclusion: 'Острый перикардит (Стадия I)'
+        },
+        pericarditis_stage2: {
+            path: ['rr_equal', 'p_present_reg', 'sr', 'pq_ok', 'qrs_ok_2', 'pericarditis_stage2'],
+            steps: [
+                { node: 'Инт. RR одинаковы?', answer: 'да' },
+                { node: 'з. P есть?*', answer: 'да → СР' },
+                { node: 'PQ ≤ 0,2 с?', answer: 'да' },
+                { node: 'все QRS ≤ 0,1 с?', answer: 'да' },
+                { node: 'Сегмент ST', answer: 'возврат к изолинии во всех отведениях' },
+                { node: 'Зубец T', answer: 'уплощён в большинстве отведений' }
+            ],
+            conclusion: 'Перикардит: возврат ST к изолинии (Стадия II)'
+        },
+        pericarditis_stage3: {
+            path: ['rr_equal', 'p_present_reg', 'sr', 'pq_ok', 'qrs_ok_2', 'pericarditis_stage3'],
+            steps: [
+                { node: 'Инт. RR одинаковы?', answer: 'да' },
+                { node: 'з. P есть?*', answer: 'да → СР' },
+                { node: 'PQ ≤ 0,2 с?', answer: 'да' },
+                { node: 'все QRS ≤ 0,1 с?', answer: 'да' },
+                { node: 'Сегмент ST', answer: 'строго на изолинии (элевация отсутствует)' },
+                { node: 'Зубец T', answer: 'диффузно инвертирован (отрицательный) после нормализации ST' }
+            ],
+            conclusion: 'Перикардит: инверсия зубцов T (Стадия III)'
+        },
+        pericarditis_effusion: {
+            path: ['rr_equal', 'p_present_reg', 'sr', 'pq_ok', 'qrs_ok_2', 'pericarditis_effusion'],
+            steps: [
+                { node: 'Инт. RR одинаковы?', answer: 'да' },
+                { node: 'з. P есть?*', answer: 'да → СР (синусовая тахикардия)' },
+                { node: 'Вольтаж QRS', answer: 'диффузный микровольтаж (< 5 мм от конечностей, < 10 мм в грудных)' },
+                { node: 'Динамика амплитуды QRS', answer: 'электрическая альтернация (ритмичное колебание амплитуды комплексов QRS через сокращение)' }
+            ],
+            conclusion: 'Перикардиальный выпот / тампонада сердца'
         }
     };
 
@@ -304,6 +350,8 @@ function buildAnalysisPlan(ecgState, languageRu) {
         pqText = '0,18 с (постоянный перед проведёнными QRS, периодически блокирован)';
     } else if (pathologyId === 'avb_3') {
         pqText = 'постоянный интервал отсутствует (полная АВ-диссоциация)';
+    } else if (pathologyId === 'pericarditis_acute') {
+        pqText = `${leadII.pq.toFixed(2)} с (норма 0,12–0,20 с); депрессия сегмента PR (PQ) в отведениях I, II, aVF, V2–V6 при реципрокной элевации PR в aVR (субэпикардиальное повреждение предсердий)`;
     } else if (!['afib', 'aflutter', 'svt', 'vt', 'v_flutter', 'v_fib'].includes(pathologyId)) {
         pqText = `${leadII.pq.toFixed(2)} с (норма 0,12–0,20 с)`;
     }
@@ -313,6 +361,8 @@ function buildAnalysisPlan(ecgState, languageRu) {
     let qrsText = `${qrsDurMax.toFixed(2)} с (норма ≤ 0,10 с)`;
     if (pathologyId === 'v_flutter' || pathologyId === 'v_fib') {
         qrsText = 'комплексы QRS отсутствуют';
+    } else if (pathologyId === 'pericarditis_effusion') {
+        qrsText = `${qrsDurMax.toFixed(2)} с (норма ≤ 0,10 с); электрическая альтернация (ритмичное чередование высоты QRS от комплекса к комплексу)`;
     } else if (['pvc_single', 'pvc_bigeminy', 'pvc_trigeminy', 'pvc_paired_poly'].includes(pathologyId)) {
         qrsText = 'основные комплексы 0,08 с; в экстрасистолах расширен до 0,14 с (> 0,10 с)';
     } else if (qrsDurMax > 0.1) {
@@ -324,6 +374,8 @@ function buildAnalysisPlan(ecgState, languageRu) {
     let qText = 'не патологический (≤ 1/4 R, < 0,03 с)';
     if (pathologyId === 'v_flutter' || pathologyId === 'v_fib') {
         qText = 'не определяется';
+    } else if (['pericarditis_acute', 'pericarditis_stage2', 'pericarditis_stage3', 'pericarditis_effusion'].includes(pathologyId)) {
+        qText = 'не патологический (зубец Q не расширен, комплексы QS отсутствуют — некроз миокарда исключён)';
     } else if (pathologyId === 'lbbb' && pathQLeads.some((l) => l.lead === 'V1')) {
         qText = 'комплекс QS в V1 (обусловлен БЛНПГ), в V5–V6 зубец q отсутствует';
     } else if (pathQLeads.length > 0) {
@@ -335,6 +387,8 @@ function buildAnalysisPlan(ecgState, languageRu) {
     let rsText = '';
     if (pathologyId === 'v_flutter' || pathologyId === 'v_fib') {
         rsText = 'неприменимо';
+    } else if (pathologyId === 'pericarditis_effusion') {
+        rsText = 'диффузный микровольтаж: размах QRS < 5 мм во всех отведениях от конечностей и < 10 мм во всех грудных отведениях; феномен электрической альтернации';
     } else if (qrsDurMax > 0.1 || ['vt'].includes(pathologyId)) {
         rsText = 'неприменимо, так как длительность комплекса QRS превышает 0,10 с';
     } else {
@@ -351,6 +405,10 @@ function buildAnalysisPlan(ecgState, languageRu) {
     let stText = 'на изолинии (точка j в пределах ±1 мм)';
     if (pathologyId === 'v_flutter' || pathologyId === 'v_fib') {
         stText = 'изоэлектрическая линия отсутствует';
+    } else if (pathologyId === 'pericarditis_acute') {
+        stText = `диффузная конкордантная вогнутая (седловидная) элевация в ${stElevLeads.join(', ')} (без зеркальной депрессии в противоположных стенках; депрессия только в aVR)`;
+    } else if (pathologyId === 'pericarditis_stage2' || pathologyId === 'pericarditis_stage3') {
+        stText = 'на изолинии (полная нормализация сегмента ST во всех 12 отведениях)';
     } else if (stElevLeads.length || stDepLeads.length) {
         const parts = [];
         if (stElevLeads.length) parts.push(`элевация в ${stElevLeads.join(', ')}`);
@@ -371,6 +429,12 @@ function buildAnalysisPlan(ecgState, languageRu) {
     let tText = 'положительный (кроме aVR)';
     if (pathologyId === 'v_flutter' || pathologyId === 'v_fib') {
         tText = 'не дифференцируется';
+    } else if (pathologyId === 'pericarditis_acute') {
+        tText = 'положительный во всех отведениях с элевацией ST (T не инвертируется пока приподнят ST)';
+    } else if (pathologyId === 'pericarditis_stage2') {
+        tText = 'диффузно уплощённый (снижение амплитуды зубца T на фоне вернувшегося к изолинии сегмента ST)';
+    } else if (pathologyId === 'pericarditis_stage3') {
+        tText = `диффузная симметричная инверсия (отрицательный T в ${negTLeads.join(', ')}) при строго изоэлектричном ST`;
     } else if (tallTLeads.length) {
         tText = `высокоамплитудный положительный остроконечный («коронарный») в ${tallTLeads.join(', ')}`;
     } else if (negTLeads.length) {
@@ -392,17 +456,17 @@ function buildAnalysisPlan(ecgState, languageRu) {
     }
 
     return [
-        { num: 1, label: 'Ритм', value: rhythmText, abnormal: !['normal_sinus', 'sinus_tachycardia', 'sinus_bradycardia', 'rbbb', 'lbbb', 'lah', 'rah', 'lvh', 'rvh', 'ischemia_subendo', 'ischemia_subepi', 'injury_subendo', 'injury_subepi', 'mi'].includes(pathologyId) },
+        { num: 1, label: 'Ритм', value: rhythmText, abnormal: !['normal_sinus', 'sinus_tachycardia', 'sinus_bradycardia', 'rbbb', 'lbbb', 'lah', 'rah', 'lvh', 'rvh', 'ischemia_subendo', 'ischemia_subepi', 'injury_subendo', 'injury_subepi', 'mi', 'pericarditis_acute', 'pericarditis_stage2', 'pericarditis_stage3', 'pericarditis_effusion'].includes(pathologyId) },
         { num: 2, label: 'Регулярность', value: regularityText, abnormal: isIrregular },
         { num: 3, label: 'ЧСС', value: hrText, abnormal: hr > 80 || hr < 60 || isIrregular },
         { num: 4, label: 'ЭОС', value: axisText, abnormal: clinicalAngle < 0 || clinicalAngle > 90 },
         { num: 5, label: 'Зубец P', value: pText, abnormal: ['afib', 'aflutter', 'svt', 'vt', 'v_flutter', 'v_fib', 'lah', 'rah', 'pac'].includes(pathologyId) },
-        { num: 6, label: 'Интервал PQ (PR)', value: pqText, abnormal: ['avb_1', 'avb_2_mobitz1', 'avb_2_mobitz2', 'avb_3', 'afib', 'aflutter', 'svt', 'vt'].includes(pathologyId) },
-        { num: 7, label: 'Длительность QRS', value: qrsText, abnormal: qrsDurMax > 0.1 || ['pvc_single', 'pvc_bigeminy', 'pvc_trigeminy', 'pvc_paired_poly', 'v_flutter', 'v_fib'].includes(pathologyId) },
+        { num: 6, label: 'Интервал PQ (PR)', value: pqText, abnormal: ['avb_1', 'avb_2_mobitz1', 'avb_2_mobitz2', 'avb_3', 'afib', 'aflutter', 'svt', 'vt', 'pericarditis_acute'].includes(pathologyId) },
+        { num: 7, label: 'Длительность QRS', value: qrsText, abnormal: qrsDurMax > 0.1 || ['pvc_single', 'pvc_bigeminy', 'pvc_trigeminy', 'pvc_paired_poly', 'v_flutter', 'v_fib', 'pericarditis_effusion'].includes(pathologyId) },
         { num: 8, label: 'Зубец Q (q)', value: qText, abnormal: pathQLeads.length > 0 && pathologyId === 'mi' },
-        { num: 9, label: 'Зубцы R и S (гипертрофия)', value: rsText, abnormal: pathologyId === 'lvh' || pathologyId === 'rvh' },
+        { num: 9, label: 'Зубцы R и S (гипертрофия)', value: rsText, abnormal: ['lvh', 'rvh', 'pericarditis_effusion'].includes(pathologyId) },
         { num: 10, label: 'Сегмент ST', value: stText, abnormal: stElevLeads.length > 0 || stDepLeads.length > 0 },
-        { num: 11, label: 'Зубец T', value: tText, abnormal: tallTLeads.length > 0 || negTLeads.length > 0 },
+        { num: 11, label: 'Зубец T', value: tText, abnormal: tallTLeads.length > 0 || negTLeads.length > 0 || ['pericarditis_stage2', 'pericarditis_stage3'].includes(pathologyId) },
         { num: 12, label: 'Заключение', value: conclusion, abnormal: pathologyId !== 'normal_sinus', isConclusion: true }
     ];
 }

@@ -187,6 +187,16 @@ function evalStT(tSec, tQrs, desc, beatType, leadName) {
         return Math.max(stPart, stPart * 0.55 + tPart * 0.75);
     }
 
+    if (desc.st.concave && stOff > 0) {
+        // Upward concave saddle-shaped ST elevation characteristic of acute pericarditis (MSD manual)
+        const u = dt / (stLen + tDur);
+        if (u <= 0 || u >= 1) return 0;
+        const stPart = stOff * Math.pow(Math.max(0, 1 - (dt / (stLen * 1.15))), 1.7);
+        const tU = Math.max(0, (dt - stLen * 0.45) / (tDur + stLen * 0.55));
+        const tPart = Math.max(0, tAmp) * bellWave(tU, desc.t.symmetric, desc.t.peaked);
+        return Math.max(stPart * 0.85, stPart * 0.65 + tPart);
+    }
+
     let stContribution = 0;
     if (stOff !== 0) {
         if (dt < stLen) {
@@ -266,13 +276,21 @@ function sampleLeadSignalMm(ecgState, leadName, tSec) {
     // Conducted / ectopic beats
     for (const b of timeline.beats) {
         if (tSec < b.time - 0.42 || tSec > b.time + 0.48) continue;
+        const scale = b.altScale || 1.0;
 
         if (b.pq > 0) {
             const pStart = b.pTime ?? (b.time - b.pq);
-            val += evalPWave(tSec, pStart, desc.p, b.type);
+            val += evalPWave(tSec, pStart, desc.p, b.type) * scale;
+            const pDur = desc.p.dur || 0.09;
+            if (desc.prOffset && tSec >= pStart + pDur * 0.7 && tSec <= b.time + 0.02) {
+                const uPr = Math.min(1, (tSec - (pStart + pDur * 0.7)) / (pDur * 0.3));
+                const dtQrs = Math.max(0, tSec - b.time);
+                const fadeQrs = Math.max(0, 1 - dtQrs / 0.02);
+                val += desc.prOffset * uPr * (dtQrs > 0 ? fadeQrs : 1) * scale;
+            }
         }
-        val += evalQrs(tSec, b.time, desc, b.type, leadName);
-        val += evalStT(tSec, b.time, desc, b.type, leadName);
+        val += evalQrs(tSec, b.time, desc, b.type, leadName) * scale;
+        val += evalStT(tSec, b.time, desc, b.type, leadName) * scale;
     }
 
     return val;

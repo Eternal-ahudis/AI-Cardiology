@@ -469,7 +469,25 @@ function buildBeatTimeline(pathologyId, hr, totalDuration = 10.5) {
         return { beats, pOnlyWaves, continuousMode: null, rrList, pCount, atrialRate: 75 };
     }
 
-    // Regular rhythms (normal, sinus_tachycardia, sinus_bradycardia, svt, vt, rbbb, lbbb, hypertrophies, ischemia/MI)
+    if (pathologyId === 'pericarditis_effusion') {
+        // Electrical alternans: alternating beat amplitude in pericardial effusion / tamponade
+        let t = 0.22;
+        let idx = 0;
+        while (t < totalDuration) {
+            beats.push({
+                time: t,
+                type: 'sinus',
+                pq: 0.15,
+                altScale: (idx % 2 === 0) ? 1.0 : 0.62
+            });
+            t += baseRR;
+            idx += 1;
+        }
+        const rrList = beats.slice(1).map((b, i) => Number((b.time - beats[i].time).toFixed(2)));
+        return { beats, pOnlyWaves, continuousMode: null, rrList };
+    }
+
+    // Regular rhythms (normal, sinus_tachycardia, sinus_bradycardia, svt, vt, rbbb, lbbb, hypertrophies, ischemia/MI, pericarditis)
     let t = 0.25;
     const beatType = pathologyId === 'svt' ? 'svt' : (pathologyId === 'vt' ? 'vt' : 'sinus');
     const pq = (pathologyId === 'svt' || pathologyId === 'vt') ? 0 : 0.16;
@@ -699,6 +717,77 @@ function applyPathologyToLead(lead, base, pathologyId, angle, options) {
                 desc.st = { offset: -2.0, slope: -0.2, monophasic: false };
             }
         }
+    }
+
+    // Pericarditis (Перикардит, по руководству MSD)
+    if (pathologyId === 'pericarditis_acute') {
+        // Stage I: diffuse concave upward ST elevation + PR depression (PR elevation in aVR)
+        if (lead === 'aVR') {
+            desc.prOffset = 1.1; // PR elevation in aVR
+            desc.st = { offset: -1.8, slope: -0.15, concave: false, monophasic: false };
+            desc.t = { amp: -2.4, dur: 0.15, peaked: false, symmetric: false };
+        } else if (lead === 'V1') {
+            desc.prOffset = 0; // PR usually isoelectric in V1
+            desc.st = { offset: 0.5, slope: 0.05, concave: true, monophasic: false };
+            desc.t = { amp: 1.8, dur: 0.16, peaked: false, symmetric: false };
+        } else if (lead === 'aVL') {
+            desc.prOffset = 0; // PR usually isoelectric in aVL (MSD manual p. 14)
+            desc.st = { offset: 1.2, slope: 0.1, concave: true, monophasic: false };
+            desc.t = { amp: 2.2, dur: 0.16, peaked: false, symmetric: false };
+        } else {
+            // I, II, III, aVF, V2-V6
+            desc.prOffset = -0.9; // PR depression
+            const isChest = lead.startsWith('V');
+            desc.st = { offset: isChest ? 3.0 : 2.2, slope: 0.15, concave: true, monophasic: false };
+            desc.t = { amp: isChest ? 4.5 : 3.5, dur: 0.16, peaked: false, symmetric: false };
+        }
+        desc.isQS = false;
+        if (desc.q.amp > 1.0) desc.q.amp = 0.5;
+    }
+
+    if (pathologyId === 'pericarditis_stage2') {
+        // Stage II: ST segment returns to baseline, T wave flattens
+        desc.prOffset = 0;
+        desc.st = { offset: 0, slope: 0, concave: false, monophasic: false };
+        desc.t = { amp: (lead === 'aVR' ? -0.4 : 0.6), dur: 0.16, peaked: false, symmetric: false };
+        desc.isQS = false;
+        if (desc.q.amp > 1.0) desc.q.amp = 0.5;
+    }
+
+    if (pathologyId === 'pericarditis_stage3') {
+        // Stage III: T wave inversion across leads after ST returned to baseline
+        desc.prOffset = 0;
+        desc.st = { offset: 0, slope: 0, concave: false, monophasic: false };
+        if (lead === 'aVR') {
+            desc.t = { amp: 2.0, dur: 0.16, peaked: false, symmetric: false };
+        } else if (lead === 'V1') {
+            desc.t = { amp: -1.2, dur: 0.16, peaked: true, symmetric: true };
+        } else if (lead === 'aVL') {
+            desc.t = { amp: -1.5, dur: 0.16, peaked: true, symmetric: true };
+        } else {
+            desc.t = { amp: lead.startsWith('V') ? -4.2 : -3.2, dur: 0.17, peaked: true, symmetric: true };
+        }
+        desc.isQS = false;
+        if (desc.q.amp > 1.0) desc.q.amp = 0.5;
+    }
+
+    if (pathologyId === 'pericarditis_effusion') {
+        // Pericardial effusion / tamponade: microvoltage in all leads
+        desc.prOffset = 0;
+        desc.st = { offset: 0, slope: 0, concave: false, monophasic: false };
+        const isLimb = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF'].includes(lead);
+        if (isLimb) {
+            desc.r.amp = Math.min(desc.r.amp, 4.0);
+            desc.s.amp = Math.min(desc.s.amp, 2.0);
+            desc.p.amp = Math.min(desc.p.amp, 0.8);
+            desc.t.amp = Math.min(desc.t.amp, 1.2);
+        } else {
+            desc.r.amp = Math.min(desc.r.amp, 7.5);
+            desc.s.amp = Math.min(desc.s.amp, 6.0);
+            desc.p.amp = Math.min(desc.p.amp, 1.0);
+            desc.t.amp = Math.min(desc.t.amp, 1.8);
+        }
+        desc.isQS = false;
     }
 
     // Extrasystole descriptors (used for premature beat shapes)
